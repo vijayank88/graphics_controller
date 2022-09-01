@@ -1,5 +1,18 @@
 # Caravel user project includes
++incdir+$(USER_PROJECT_VERILOG)/rtl
++incdir+$(USER_PROJECT_VERILOG)/rtl/src
 -v $(USER_PROJECT_VERILOG)/rtl/user_project_wrapper.v	     
--v $(USER_PROJECT_VERILOG)/rtl/user_proj_example.v
-
- 
+-v $(USER_PROJECT_VERILOG)/rtl/src/openGFX430.v
+-v $(USER_PROJECT_VERILOG)/rtl/src/ogfx_ram_arbiter.v
+-v $(USER_PROJECT_VERILOG)/rtl/src/ogfx_backend.v
+-v $(USER_PROJECT_VERILOG)/rtl/src/ogfx_backend_lut_fifo.v
+-v $(USER_PROJECT_VERILOG)/rtl/src/ogfx_backend_frame_fifo.v
+-v $(USER_PROJECT_VERILOG)/rtl/src/ogfx_if_lt24.v
+-v $(USER_PROJECT_VERILOG)/rtl/src/ogfx_gpu.v
+-v $(USER_PROJECT_VERILOG)/rtl/src/ogfx_gpu_dma.v
+-v $(USER_PROJECT_VERILOG)/rtl/src/ogfx_gpu_dma_addr.v
+-v $(USER_PROJECT_VERILOG)/rtl/src/ogfx_gpu_reg.v
+-v $(USER_PROJECT_VERILOG)/rtl/src/ogfx_reg.v
+-v $(USER_PROJECT_VERILOG)/rtl/src/ogfx_reg_fifo.v
+-v $(USER_PROJECT_VERILOG)/rtl/src/ogfx_reg_vram_if.v
+-v $(USER_PROJECT_VERILOG)/rtl/src/ogfx_reg_vram_addr.v 

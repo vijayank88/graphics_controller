@@ -28,7 +28,11 @@
  *
  *-------------------------------------------------------------
  */
-
+`default_nettype none
+`ifdef OGFX_NO_INCLUDE
+`else
+`include "src/openGFX430_defines.v"
+`endif
 module user_project_wrapper #(
     parameter BITS = 32
 ) (
@@ -81,43 +85,63 @@ module user_project_wrapper #(
 /*--------------------------------------*/
 /* User project is instantiated  here   */
 /*--------------------------------------*/
+parameter LA_WIDTH = `VRAM_MSB+2+16;
+//Unused Ports:
+ assign user_irq[2:1]=2'b00;
+ assign io_oeb[`MPRJ_IO_PADS-1:7]={30{1'b0}};
+ assign io_out[`MPRJ_IO_PADS-1:32]={6{1'b0}};
+ assign la_data_out[127:LA_WIDTH+`LRAM_MSB+14]={62{1'b0}};
+ assign wbs_dat_o[31:0]={32{1'b0}};
+ assign wbs_ack_o=1'b0;
 
-user_proj_example mprj (
+openGFX430 GFX430 (
 `ifdef USE_POWER_PINS
 	.vccd1(vccd1),	// User area 1 1.8V power
 	.vssd1(vssd1),	// User area 1 digital ground
 `endif
 
-    .wb_clk_i(wb_clk_i),
-    .wb_rst_i(wb_rst_i),
+// OUTPUTs
+    .irq_gfx_o(user_irq[0]),                            // Graphic Controller interrupt
 
-    // MGMT SoC Wishbone Slave
+    .lt24_cs_n_o(io_oeb[0]),                           // LT24 Chip select (Active low)
+    .lt24_rd_n_o(io_oeb[1]),                           // LT24 Read strobe (Active low)
+    .lt24_wr_n_o(io_oeb[2]),                           // LT24 Write strobe (Active low)
+    .lt24_rs_o(io_oeb[3]),                             // LT24 Command/Param selection (Cmd=0/Param=1)
+    .lt24_d_o(io_out[15:0]),                              // LT24 Data output
+    .lt24_d_en_o(io_oeb[4]),                           // LT24 Data output enable
+    .lt24_reset_n_o(io_oeb[5]),                        // LT24 Reset (Active Low)
+    .lt24_on_o(io_oeb[6]),                             // LT24 on/off
 
-    .wbs_cyc_i(wbs_cyc_i),
-    .wbs_stb_i(wbs_stb_i),
-    .wbs_we_i(wbs_we_i),
-    .wbs_sel_i(wbs_sel_i),
-    .wbs_adr_i(wbs_adr_i),
-    .wbs_dat_i(wbs_dat_i),
-    .wbs_ack_o(wbs_ack_o),
-    .wbs_dat_o(wbs_dat_o),
+    .per_dout_o(io_out[31:16]),                            // Peripheral data output
 
-    // Logic Analyzer
+`ifdef WITH_PROGRAMMABLE_LUT
+    .lut_ram_addr_o(la_data_out[LA_WIDTH+`LRAM_MSB+1:LA_WIDTH+1]),                        // LUT-RAM address
+    .lut_ram_wen_o(la_data_out[LA_WIDTH+`LRAM_MSB+2]),                         // LUT-RAM write enable (active low)
+  .lut_ram_cen_o(la_data_out[LA_WIDTH+`LRAM_MSB+3]),                         // LUT-RAM enable (active low)
+    .lut_ram_din_o(la_data_out[LA_WIDTH+`LRAM_MSB+19:LA_WIDTH+`LRAM_MSB+4]),                         // LUT-RAM data input
+`endif
 
-    .la_data_in(la_data_in),
-    .la_data_out(la_data_out),
-    .la_oenb (la_oenb),
+    .vid_ram_addr_o(la_data_out[`VRAM_MSB:0]),                        // Video-RAM address
+    .vid_ram_wen_o(la_data_out[`VRAM_MSB+1]),                         // Video-RAM write enable (active low)
+    .vid_ram_cen_o(la_data_out[`VRAM_MSB+2]),                         // Video-RAM enable (active low)
+    .vid_ram_din_o(la_data_out[LA_WIDTH:`VRAM_MSB+3]),                         // Video-RAM data input
 
-    // IO Pads
+// INPUTs
+    .dbg_freeze_i(wbs_cyc_i),                          // Freeze address auto-incr on read
+    .mclk(wb_clk_i),                                  // Main system clock
+    .per_addr_i(wbs_adr_i[13:0]),                            // Peripheral address
+    .per_din_i(wbs_dat_i[15:0]),                             // Peripheral data input
+    .per_en_i(wbs_stb_i),                              // Peripheral enable (high active)
+    .per_we_i({wbs_sel_i[0],wbs_we_i}),                              // Peripheral write enable (high active)
+    .puc_rst(wb_rst_i),                               // Main system reset
 
-    .io_in (io_in),
-    .io_out(io_out),
-    .io_oeb(io_oeb),
+    .lt24_d_i(wbs_dat_i[31:16]),                              // LT24 Data input
 
-    // IRQ
-    .irq(user_irq)
+`ifdef WITH_PROGRAMMABLE_LUT
+  .lut_ram_dout_i(la_data_in[15:0]),                        // LUT-RAM data output
+`endif
+    .vid_ram_dout_i(wbs_dat_i[31:16])                         // Video-RAM data output
 );
-
 endmodule	// user_project_wrapper
 
 `default_nettype wire
