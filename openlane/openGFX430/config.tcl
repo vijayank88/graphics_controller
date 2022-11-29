@@ -13,8 +13,8 @@
 # limitations under the License.
 # SPDX-License-Identifier: Apache-2.0
 
+set ::env(PDK) "sky130A"
 set ::env(PDK) $::env(PDK)
-#set ::env(PDK) "sky130A"
 set ::env(STD_CELL_LIBRARY) "sky130_fd_sc_hd"
 
 set script_dir [file dirname [file normalize [info script]]]
@@ -28,22 +28,15 @@ set ::env(VERILOG_FILES) "\
 set ::env(DESIGN_IS_CORE) 0
 
 set ::env(CLOCK_PORT) "mclk"
-#set ::env(CLOCK_NET) "counter.clk"
 set ::env(CLOCK_PERIOD) "10"
 
-#set ::env(FP_SIZING) "absolute"
-#set ::env(DIE_AREA) {0.0 0.0 2750 2760}
-#set ::env(CORE_AREA) {5 10 2743 2753}
 set ::env(FP_CORE_UTIL) 30
 
-#set ::env(FP_PIN_ORDER_CFG) $script_dir/pin_order.cfg
 
 set ::env(PL_TARGET_DENSITY) 0.35
 set ::env(DPL_CELL_PADDING) {2}
-set ::env(CELL_PAD) {2}
 set ::env(SYNTH_STRATEGY) {DELAY 0}
 set ::env(GRT_ADJUSTMENT) {0.2}
-set ::env(GLB_RT_ADJUSTMENT) {0.2}
 
 # Maximum layer used for routing is metal 4.
 # This is because this macro will be inserted in a top level (user_project_wrapper) 
